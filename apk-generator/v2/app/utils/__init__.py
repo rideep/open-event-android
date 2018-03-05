@@ -4,7 +4,7 @@ import shutil
 import zipfile
 import os
 from tempfile import mkstemp
-import errno
+from xml.etree import cElementTree as ElementTree
 
 import bleach
 import hashlib
@@ -76,20 +76,9 @@ def unzip(source_file, target_dir):
     :param target_dir: the path to the destination directory
     :return:
     """
-    with open(source_file, "rb") as zip_src:
-        zip_file = zipfile.ZipFile(zip_src)
-        for member in zip_file.infolist():
-            target_path = os.path.join(target_dir, member.filename)
-            if target_path.endswith('/'):  # folder entry, create
-                try:
-                    os.makedirs(target_path)
-                except (OSError, IOError) as err:
-                    # Windows may complain if the folders already exist
-                    if err.errno != errno.EEXIST:
-                        raise
-                continue
-            with open(target_path, 'wb') as outfile, zip_file.open(member) as infile:
-                shutil.copyfileobj(infile, outfile)
+    zip_file = zipfile.ZipFile(source_file, 'r')
+    zip_file.extractall(target_dir)
+    zip_file.close()
 
 
 def strip_tags(html):
@@ -110,3 +99,28 @@ def allowed_file(filename, allowed_extensions):
     """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def colors():
+    """
+    Get the default colors of the app theme
+    :return:
+    """
+    colors = {'primary': '#F44336', 'primary_dark': '#D32F2F', 'accent': '#B71C1C'}
+    return colors
+
+
+def change_theme(path, colors):
+    """
+    Replace the theme colors of the app
+    :param path: Path to the colors.xml file
+    :param colors: Colors dict with keys of the form presented in colors method
+    :return:
+    """
+    tree = ElementTree.parse(path)
+    root = tree.getroot()
+
+    for key in colors.keys():
+        element = root.find("./color[@name='color_%s']" % key)
+        element.text = colors[key]
+    tree.write(path)

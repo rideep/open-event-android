@@ -1,11 +1,11 @@
-# Open Event Android
+![Open Event Android](https://storage.googleapis.com/eventyay.com/assets/branding/android_branding.png)
 
 [![Build Status](https://travis-ci.org/fossasia/open-event-android.svg?branch=development)](https://travis-ci.org/fossasia/open-event-android?branch=development)
 [![codecov.io](https://codecov.io/github/fossasia/open-event-android/coverage.svg?branch=development)](https://codecov.io/github/fossasia/open-event-android?branch=development)
 [![Join the chat at https://gitter.im/fossasia/open-event-android](https://badges.gitter.im/fossasia/open-event-android.svg)](https://gitter.im/fossasia/open-event-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Preview the app](https://img.shields.io/badge/Preview-Appetize.io-orange.svg)](https://appetize.io/app/2rfx5pavny47jnb1qzwg204fr8)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d32f87844a9346d09f3e8ad09600d3e1)](https://www.codacy.com/app/dev_19/open-event-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fossasia/open-event-android&amp;utm_campaign=Badge_Grade)
-[![Mailing List](https://img.shields.io/badge/Mailing%20List-FOSSASIA-blue.svg)](mailto: fossasia@googlegroups.com)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/15475df939da4195ae36f06f235a7aad)](https://www.codacy.com/app/harshithdwivedi/open-event-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fossasia/open-event-android&amp;utm_campaign=Badge_Grade)
+[![Mailing List](https://img.shields.io/badge/Mailing%20List-FOSSASIA-blue.svg)](mailto:fossasia@googlegroups.com)
 
 
 The Open Event Android project consists of two components. The **App Generator** is a web application that is hosted on a server and generates an event Android app from a zip with JSON and binary files ([examples here](http://github.com/fossasia/open-event)) or through an API. The second component we are developing in the project is a generic **Android app** - the output of the app generator. The mobile app can be installed on any Android device for browsing information about the event. Updates can be made automatically through API endpoint connections from an online source (e.g. server), which needs to defined in the provided event zip with the JSON files. The Android app has a standard configuration file, that sets the details of the app (e.g. color scheme, logo of event, link to JSON app data).
@@ -32,15 +32,29 @@ A sample app for testing purposes is automatically built after commits in the re
 
 ### Screenshots of a sample Android app
 
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652908/96d8b274-0350-11e7-88c9-339987c09929.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652918/9d538520-0350-11e7-991b-39111bf62045.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652925/a13478a2-0350-11e7-8261-84e4e8c170e3.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652949/b9317342-0350-11e7-98cd-f9ee70b0c0ff.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652963/c16b8dea-0350-11e7-8ea1-d6af95f87529.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652968/c9f248e6-0350-11e7-9b43-3eea45388362.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652981/d77d07e4-0350-11e7-84e0-f32292262029.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23652992/dd859584-0350-11e7-813a-fe6eafd4a133.png" height = '480' width="270">
-<img src="https://cloud.githubusercontent.com/assets/17262180/23680497/6fe02358-03b1-11e7-8e63-32eb53a4dff2.png" height = '480' width="270">
+<p align="center">
+<img src="docs/_static/images/app-bookmarks-and-home.png" height = "480" width="270"> <img src="docs/_static/images/app-drawer.png" height = "480" width="270"> <img src="docs/_static/images/app-schedule.png" height = "480" width="270">
+</p>
+
+<p align="center">
+<img src="docs/_static/images/app-tracks.png" height = "480" width="270"> <img src="docs/_static/images/app-track-sessions.png" height = "480" width="270"> <img src="docs/_static/images/app-event-detail.png" height = "480" width="270">
+</p>
+
+<p align="center">
+<img src="docs/_static/images/app-speakers.png" height = "480" width="270"> <img src="docs/_static/images/app-speaker-detail.png" height = "480" width="270"> <img src="docs/_static/images/app-sponsors.png" height = "480" width="270">
+</p>
+
+<p align="center">
+<img src="docs/_static/images/app-locations.png" height = "480" width="270"> <img src="docs/_static/images/app-location-detail.png" height = "480" width="270"> <img src="docs/_static/images/app-map.png" height = "480" width="270">
+</p>
+
+<p align="center">
+<img src="docs/_static/images/app-live-feed.png" height = "480" width="270"> <img src="docs/_static/images/app-settings.png" height = "480" width="270"> <img src="docs/_static/images/app-schedule-sort.png" height = "480" width="270">
+</p>
+
+<p align="center">
+<img src="docs/_static/images/app-user-sign-up.png" height = "480" width="270"> <img src="docs/_static/images/app-user-log-in.png" height = "480" width="270"> <img src="docs/_static/images/app-user-profile.png" height = "480" width="270">
+</p>
 
 ### Android App Development Set up
 
@@ -60,9 +74,13 @@ Please find info about the set up of the Android app in your development environ
 - Retrofit [Docs](http://square.github.io/retrofit/2.x/retrofit/)
 - ButterKnife [Docs](http://jakewharton.github.io/butterknife/javadoc/)
 - Timber [Docs](http://jakewharton.github.io/timber/)
-- Google Gson [Docs](http://www.javadoc.io/doc/com.google.code.gson/gson/2.7)
+- Jackson [Docs](https://github.com/FasterXML/jackson)
 - LeakCanary [Docs](https://github.com/square/leakcanary)
 - Picasso [Docs](http://square.github.io/picasso/2.x/picasso/)
+- Realm [Docs](https://realm.io/docs/java/latest/)
+- Stetho [Docs](http://facebook.github.io/stetho/)
+- Stetho Realm [Docs](https://github.com/uPhyca/stetho-realm)
+- Lombok [Docs](https://projectlombok.org/features/all)
 
 ### Devices tested on
 
@@ -94,7 +112,7 @@ Installation instructions for generic servers are [here](docs/installation/gener
 
 #### How to install The Open Event Android App Generator on Google Cloud/Kubernetes
 
-Installation instructions for Google Cloud Kubernetes are [here](docs/installation/kubernetes.md).
+Installation instructions for Google Cloud Kubernetes are [here](docs/installation/gce-kubernetes.md).
 
 #### How to install The Open Event Android App Generator on AWS
 
@@ -107,6 +125,8 @@ Installation instructions for Digital Ocean servers are [here](docs/installation
 #### How to install The Open Event Android App Generator on Docker
 
 Installation instructions for docker are [here](docs/installation/docker.md).
+
+**Note: You will need to install Lombok Plugin in Android Studio in order to properly access generated methods of data classes**
 
 ## Contributions, Bug Reports, Feature Requests
 

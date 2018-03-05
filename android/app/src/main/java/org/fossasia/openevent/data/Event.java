@@ -1,176 +1,64 @@
 package org.fossasia.openevent.data;
 
-import android.database.DatabaseUtils;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.jasminb.jsonapi.IntegerIdHandler;
+import com.github.jasminb.jsonapi.annotations.Id;
+import com.github.jasminb.jsonapi.annotations.Relationship;
+import com.github.jasminb.jsonapi.annotations.Type;
 
-import com.google.gson.annotations.SerializedName;
+import org.fossasia.openevent.data.extras.Copyright;
+import org.fossasia.openevent.data.extras.SocialLink;
+import org.fossasia.openevent.data.extras.SpeakersCall;
 
-import org.fossasia.openevent.dbutils.DbContract;
-import org.fossasia.openevent.utils.StringUtils;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Locale;
+@Data
+@Type("event")
+@EqualsAndHashCode(callSuper = false)
+@JsonNaming(PropertyNamingStrategy.KebabCaseStrategy.class)
+public class Event extends RealmObject {
 
-/**
- * Created by MananWason on 27-05-2015.
- */
-public class Event {
-
+    @PrimaryKey
+    @Id(IntegerIdHandler.class)
     private int id;
-
+    private String identifier;
     private String name;
-
-    private String email;
-
-    private String logo;
-
-    @SerializedName("start_time")
-    private String start;
-
-    @SerializedName("end_time")
-    private String end;
-
-    private float latitude;
-
-    private float longitude;
-
-    @SerializedName("location_name")
+    private Double latitude;
+    private Double longitude;
     private String locationName;
-
-    @SerializedName("event_url")
-    private String url;
-
+    private String startsAt;
+    private String endsAt;
     private String timezone;
-
-    private Version version;
-
-    public Event(int id, String name, String email, String logo, String start,
-                 String end, float latitude, float longitude, String locationName, String url, String timezone) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.logo = logo;
-        this.start = start;
-        this.end = end;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.locationName = locationName;
-        this.url = url;
-        this.timezone = timezone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public int getId() {
-
-        return id;
-
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
-    public String getStart() {
-        return start;
-    }
-
-    public void setStart(String start) {
-        this.start = start;
-    }
-
-    public String getEnd() {
-        return end;
-    }
-
-    public void setEnd(String end) {
-        this.end = end;
-    }
-
-    public float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
-    }
-
-    public float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getLocationName() {
-        return locationName;
-    }
-
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public void setVersion(Version version) {
-        this.version = version;
-    }
-
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
-
-    public String generateSql() {
-        String insertQuery = "INSERT INTO %s VALUES ('%d', %s, %s, %s, %s, %s, '%f', '%f', %s, %s, %s);";
-        return String.format(Locale.ENGLISH,
-                insertQuery,
-                DbContract.Event.TABLE_NAME,
-                id,
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(name)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(email)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(logo)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(start)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(end)),
-                latitude,
-                longitude,
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(locationName)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(url)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(timezone))
-                );
-    }
+    private String description;
+    private String logoUrl;
+    private String organizerName;
+    private String organizerDescription;
+    private String ticketUrl;
+    private String privacy;
+    private String type;
+    private String topic;
+    private String subTopic;
+    private String codeOfConduct;
+    private String email;
+    private String schedulePublishedOn;
+    private String searchableLocationName;
+    private String state;
+    private boolean isSessionsSpeakersEnabled;
+    private String thumbnailImageUrl;
+    private String originalImageUrl;
+    private String largeImageUrl;
+    private String iconImageUrl;
+    private String createdAt;
+    private String deletedAt;
+    @Relationship("event-copyright")
+    private Copyright eventCopyright;
+    @Relationship("speakers-call")
+    private SpeakersCall speakersCall;
+    @Relationship("social-links")
+    private RealmList<SocialLink> socialLinks;
 }

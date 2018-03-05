@@ -8,7 +8,14 @@ var $generateBtn = $("#generate-btn"),
     $form = $("#form"),
     $actionBtnGroup = $("#action-btn-group"),
     $dataSourceRadio = $("input:radio[name=data-source]"),
-    dataSourceType = null;
+    dataSourceType = null,
+    $buildTypeRadio = $("input:radio[name=build-type]"),
+    buildType = null,
+    $authOptionCheckbox = $("input:checkbox[name=is-auth-enabled]"),
+    $colorPrimary = $("#cp-primary"),
+    $colorPrimaryDark = $("#cp-primary-dark"),
+    $colorAccent = $("#cp-accent"),
+    $deploymentLink = $("#deploy-link");
 
 var $fileProgressHolder = $("#file-progress"),
     $fileProgressBar = $("#file-progress-bar"),
@@ -25,17 +32,44 @@ var identifier = null,
     pollingWorker = null,
     downloadUrl = null;
 
+var menuDisplay = false;
+
+$(".custom-menubutton").click(function() {
+    var menuContent = $(".custom-menu-cont")[0];
+
+    if (menuDisplay) {
+        $(menuContent).removeClass("shown");
+        $(menuContent).addClass("hidden");
+    } else {
+        $(menuContent).removeClass("hidden");
+        $(menuContent).addClass("shown");
+    }
+    menuDisplay = !menuDisplay;
+});
+
+/**
+ * Enable the generate button
+ *
+ * @param enabled
+ */
+function enableGenerateButton(enabled) {
+    $errorMessageHolder.hide();
+    $statusMessageHolder.hide();
+    $generateBtn.prop("disabled", !enabled);
+    $downloadBtn.disable();
+}
+
 $dataSourceRadio.change(
     function () {
         enableGenerateButton(false);
         $apiEndpointInput.val("");
         if (this.checked) {
             dataSourceType = $(this).val();
-            if (dataSourceType === 'json_upload') {
+            if (dataSourceType === "json_upload") {
                 $jsonUploadInputHolder.show();
                 $apiEndpointInputHolder.hide();
             }
-            if (dataSourceType === 'api_endpoint') {
+            if (dataSourceType === "api_endpoint") {
                 $apiEndpointInputHolder.show();
                 $jsonUploadInputHolder.hide();
             }
@@ -43,9 +77,18 @@ $dataSourceRadio.change(
     }
 );
 
+$buildTypeRadio.change(
+    function () {
+        if (this.checked) {
+            enableGenerateButton(true);
+            buildType = $(this).val();
+        }
+    }
+);
+
 $apiEndpointInput.valueChange(function (value) {
-    if (dataSourceType === 'api_endpoint') {
-        if (value.trim() !== "" && isLink(value.trim())) {
+    if (dataSourceType === "api_endpoint") {
+        if (buildType !== null && value.trim() !== "" && isLink(value.trim())) {
             enableGenerateButton(true);
         } else {
             enableGenerateButton(false);
@@ -54,9 +97,9 @@ $apiEndpointInput.valueChange(function (value) {
 });
 
 $jsonUploadInput.change(function () {
-    if (dataSourceType === 'json_upload') {
-        $fileProgressBar.css('width', 0);
-        if (this.value !== "") {
+    if (dataSourceType === "json_upload") {
+        $fileProgressBar.css("width", 0);
+        if (buildType !== null && this.value !== "") {
             enableGenerateButton(true);
         } else {
             enableGenerateButton(false);
@@ -68,24 +111,33 @@ $jsonUploadInput.change(function () {
  * Set the form to the initial state
  */
 function initialState() {
-    $dataSourceRadio.prop('checked', false);
+    $dataSourceRadio.prop("checked", false);
     $generateBtn.disable();
     $downloadBtn.disable();
     $actionBtnGroup.show();
+    $colorPrimary.colorpicker();
+    $colorPrimaryDark.colorpicker();
+    $colorAccent.colorpicker();
 }
 initialState();
 
+/**
+ * Update the file upload progress bar
+ * @param progress
+ */
+function updateProgress(progress) {
+    $fileProgressHolder.show();
+    var percentCompleted = Math.round((progress.loaded * 100) / progress.total);
+    $fileProgressBar.css("width", percentCompleted + "%");
+    $fileProgressVal.text(percentCompleted + "%");
+}
 
 /**
- * Enable the generate button
- *
- * @param enabled
+ * Hide the file upload progress bar
  */
-function enableGenerateButton(enabled) {
-    $errorMessageHolder.hide();
-    $statusMessageHolder.hide();
-    $generateBtn.prop('disabled', !enabled);
-    $downloadBtn.disable();
+function hideProgress() {
+    updateProgress({loaded: 0, total: 100});
+    $fileProgressHolder.hide();
 }
 
 /**
@@ -102,25 +154,6 @@ function enableDownloadButton() {
 }
 
 /**
- * Update the file upload progress bar
- * @param progress
- */
-function updateProgress(progress) {
-    $fileProgressHolder.show();
-    var percentCompleted = Math.round((progress.loaded * 100) / progress.total);
-    $fileProgressBar.css('width', percentCompleted + '%');
-    $fileProgressVal.text(percentCompleted + '%');
-}
-
-/**
- * Hide the file upload progress bar
- */
-function hideProgress() {
-    updateProgress({loaded: 0, total: 100});
-    $fileProgressHolder.hide();
-}
-
-/**
  * Update the status message
  *
  * @param status
@@ -132,9 +165,25 @@ function updateStatus(status) {
     if (status) {
         $statusMessage.text(status);
     } else {
-        $statusMessage.text($statusMessage.data('original'));
+        $statusMessage.text($statusMessage.data("original"));
     }
 }
+
+function deployStatus() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            var version = JSON.parse(this.responseText).object.sha;
+            var versionLink = "https://github.com/fossasia/open-event-android/tree/" + version;
+            $("#deploy-link").attr("href", versionLink);
+            $("#deploy-link").html(version);
+        }
+    };
+    xhttp.open("GET", "https://api.github.com/repos/fossasia/open-event-android/git/refs/heads/development", true);
+    xhttp.send();
+}
+
+deployStatus();
 
 /**
  * Show an error message
@@ -150,7 +199,7 @@ function showError(error) {
     if (error) {
         $errorMessage.text(error);
     } else {
-        $errorMessage.text($errorMessage.data('original'));
+        $errorMessage.text($errorMessage.data("original"));
     }
 }
 
@@ -166,60 +215,22 @@ $downloadBtn.click(function () {
 });
 
 /**
- * Submit the data to the backend via AJAX when the form is submitted
- */
-$form.submit(function (e) {
-    e.preventDefault();
-    downloadUrl = null;
-    $form.lockFormInputs();
-    var data = new FormData();
-    data.append('email', $emailInput.val());
-    data.append('data-source', dataSourceType);
-
-    var config = {};
-
-    if (dataSourceType === 'json_upload') {
-        data.append('json-upload', $jsonUploadInput[0].files[0]);
-        config.onUploadProgress = updateProgress;
-    } else {
-        data.append('api-endpoint', $apiEndpointInput.val());
-    }
-
-    updateStatus();
-
-    axios
-        .post('/', data, config)
-        .then(function (res) {
-            hideProgress();
-            identifier = res.data.identifier;
-            taskId = res.data.task_id;
-            updateStatus("Waiting in line :)");
-            if (taskId && taskId.trim() !== '') {
-                startPoll();
-            }
-        })
-        .catch(function () {
-            showError();
-        });
-});
-
-/**
  * Start the continuous poll for getting status updates
  */
 function startPoll() {
     pollingWorker = setInterval(function () {
         axios
-            .get('/api/v2/app/' + taskId + '/status')
+            .get("/api/v2/app/" + taskId + "/status")
             .then(function (res) {
                 res = res.data;
                 switch (res.state) {
-                    case 'FAILURE':
+                    case "FAILURE":
                         showError();
                         clearInterval(pollingWorker);
                         break;
-                    case 'SUCCESS':
-                        if (res.hasOwnProperty('result')) {
-                            downloadUrl = res.result;
+                    case "SUCCESS":
+                        if (res.hasOwnProperty("result")) {
+                            downloadUrl = res.result.hasOwnProperty("message") ? res.result.message : res.result;
                             enableDownloadButton();
                         } else {
                             showError();
@@ -235,3 +246,48 @@ function startPoll() {
             });
     }, 1000);
 }
+
+/**
+ * Submit the data to the backend via AJAX when the form is submitted
+ */
+$form.submit(function (e) {
+    e.preventDefault();
+    downloadUrl = null;
+    $form.lockFormInputs();
+    var data = new FormData();
+    data.append("email", $emailInput.val());
+    data.append("data-source", dataSourceType);
+    data.append("build-type", buildType);
+    data.append("is-auth-enabled", $authOptionCheckbox.is(":checked"));
+    data.append("colors", JSON.stringify({
+        'primary': $colorPrimary.colorpicker('getValue'),
+        'primary_dark': $colorPrimaryDark.colorpicker('getValue'),
+        'accent': $colorAccent.colorpicker('getValue')
+    }));
+
+    var config = {};
+
+    if (dataSourceType === "json_upload") {
+        data.append("json-upload", $jsonUploadInput[0].files[0]);
+        config.onUploadProgress = updateProgress;
+    } else {
+        data.append("api-endpoint", $apiEndpointInput.val());
+    }
+
+    updateStatus();
+
+    axios
+        .post("/", data, config)
+        .then(function (res) {
+            hideProgress();
+            identifier = res.data.identifier;
+            taskId = res.data.task_id;
+            updateStatus("Waiting in line :)");
+            if (taskId && taskId.trim() !== "") {
+                startPoll();
+            }
+        })
+        .catch(function () {
+            showError();
+        });
+});
